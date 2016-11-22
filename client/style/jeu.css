@@ -1,0 +1,93 @@
+html {
+    background: radial-gradient(50% 100%, rgba(255, 255, 255, .2), rgba(255, 255, 255, 0)), linear-gradient(90deg, rgba(50, 100, 170, .7) 1px, transparent 0), linear-gradient(180deg, rgba(50, 100, 170, .7) 1px, transparent 0), linear-gradient(90deg, rgba(50, 100, 170, .4) 1px, transparent 0), linear-gradient(180deg, rgba(50, 100, 170, .4) 1px, transparent 0), linear-gradient(90deg, rgba(50, 100, 170, 1) 2px, transparent 0), linear-gradient(180deg, rgba(50, 100, 170, 1) 2px, transparent 0);
+    background-color: #074b97;
+    background-size: 100% 100%, 50px 50px, 50px 50px, 25px 25px, 25px 25px, 100px 100px, 100px 100px;
+    background-attachment: local;
+    width: 100%;
+    height: 100%;
+}
+body {
+    font-family: 'Raleway', sans-serif;
+}
+@import url(https://fonts.googleapis.com/css?family=Raleway);
+#login {
+    z-index: 1;
+}
+#login, #attente, #gagnant {
+    position: absolute;
+    margin: auto;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 50%;
+    height: 110px;
+    background-color: #0088cc;
+    box-shadow: 0px 0px 100px 0px #000;
+}
+#login-titre, #attente-texte, #gagnant-titre, #regles-titre {
+    text-align: center;
+    font-size: 2em;
+    font-weight: 400;
+    margin: 10px 0px 0px 0px;
+}
+#regles{
+  position: absolute;
+  margin: auto;
+  top:-520px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 50%;
+  height: 110px;
+  background-color: #0088cc;
+  box-shadow: 0px 0px 100px 0px #000;
+}
+#regles-titre {
+   font-size: 1.4em;
+   text-align: center;
+ }
+input {
+    width: calc(100% - 4px);
+    resize: none;
+    background: #00A9FF;
+    border: none;
+    color: #FFF;
+    font-family: 'Raleway', sans-serif;
+    font-size: 1.25em;
+}
+button {
+    color: #000;
+    background: #00a9ff;
+    border: none;
+    -webkit-transition: all 0.7s ease;
+    transition: all 0.7s ease;
+    margin: 1% 45%;
+    font-size: 1.2em;
+}
+button:hover {
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+}
+#jeu {
+    width: 850px;
+    height: 400px;
+    float: left;
+    border: 1px solid black;
+}
+#enligne, #topScore {
+    float: left;
+    text-align: center;
+    border: 0.5px solid lightgray;
+    width: 190px;
+    height: 400px;
+}
+.carre {
+    width: 2px;
+    height: 2px;
+    background-color: red;
+}
+#enligne, #topScore, #attente, #gagnant {
+    display: none;
+}

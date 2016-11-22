@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="/client/style/jeu.css" media="screen" title="no title" charset="utf-8">
+        <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
+        <title>Jeu</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    </head>
+    <body>
+        <div id="regles">
+          <div id="regles-titre">
+            <span>Faites progresser votre bille à l'aide des touches directionnelles et attrapez les cubes.
+            Le premier à en attraper 11 à remporté la partie</span>
+          </div>
+        </div>
+        <div id="login">
+            <div id="login-titre">
+                <span>Veuillez entrer un pseudo</span>
+            </div>
+            <input type="text" name="pseudo" value="" placeholder="Pseudo" id="login-pseudo">
+            <button type="button" name="button" id="login-jouer">Jouer</button>
+        </div>
+        <div id="attente" style="display: none">
+            <div id="attente-texte">
+                <span>Veuillez attendre qu'un autre joueur se connecte</span>
+            </div>
+        </div>
+        <div id="jeu" style="display: none">
+            <div id="joueur"></div>
+        </div>
+        <div id="enligne" style="display: none">
+            <h4>Joueurs en ligne:
+            </h4>
+            <hr>
+        </div>
+        <div id="gagnant" style="display:none">
+            <div id="gagnant-titre"></div>
+        </div>
+        <div id="topScore">
+            <h4>Top Scores:</h4>
+            <hr>
+
+        </div>
+    </body>
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+    <script type="text/javascript">
+        var socket = io();
+
+        var login = document.getElementById('login');
+        var pseudo = document.getElementById('login-pseudo');
+        var jouer = document.getElementById('login-jouer');
+        var attente = document.getElementById('attente');
+
+        var tableauJoueurs = [];
+
+        // Affichage top score
+        socket.on('topScore', function(data) {
+            for (var i = 0; i < data.length; i++) {
+                $("#topScore").append('<div class=' + data[i].pseudo + '>' + data[i].pseudo + ' : ' + data[i].score + '</div>');
+            }
+        });
+
+        // Démarrage après login
+        jouer.onclick = function() {
+            if (pseudo.value === '' || pseudo.value === tableauJoueurs) {
+                $('#login-titre').text('Pseudo non valide');
+                tableauJoueurs.splice(pseudo.value);
+            } else {
+                socket.emit('jouer', {pseudo: pseudo.value});
+            }
+            tableauJoueurs.push(pseudo.value);
+        }
+
+        // Vérification et démarrage de la partie
+        socket.on('ajoutReponse', function(data) {
+            if (data.success) {
+                login.style.display = 'none';
+                regles.style.display = 'none'
+                topScore.style.display = 'inline-block';
+                jeu.style.display = 'inline-block';
+                enligne.style.display = 'inline-block';
+            } else {
+                console.log('Utilisateur non ajouté');
+            }
+        });
+
+        // Mise en place du jeu
+        socket.on('joueur', function(joueur) {
+
+          // Vérification du nombre de joueurs
+            if (joueur.length < 2) {
+                attente.style.display = 'inline-block';
+                jeu.style.display = 'none';
+            } else {
+                attente.style.display = 'none';
+                jeu.style.display = 'inline-block';
+
+            }
+
+            for (var i = 0; i < joueur.length; i++) {
+                //Avatar
+                $('#' + joueur[i].pseudo + ':first').remove();
+                $("#jeu").append('<div id="' + joueur[i].pseudo + '" style="border-radius: 20px 20px; background-color: ' + joueur[i].couleur + '; top:' + joueur[i].y + 'px;left:' + joueur[i].x + 'px; position: absolute ; width : 20px; height : 20px"></div>');
+
+                // Objet
+                $('#obj:first').remove();
+                $("#jeu").append('<div id="obj" style="border: 1px solid black; background-color: ' + joueur[i].objcouleur + '; top:' + joueur[i].objy + 'px;left:' + joueur[i].objx + 'px; position: absolute ; width : 5px; height : 5px"></div>');
+
+                // Joueurs connectés
+                $('.' + joueur[i].pseudo + ':first').remove();
+                $("#enligne").append('<div class=' + joueur[i].pseudo + '>' + joueur[i].pseudo + ' : ' + joueur[i].score + '</div>');
+            }
+        });
+
+        // Fin de la partie
+        socket.on('fin', function(data) {
+            gagnant.style.display = 'inline-block';
+            $('#' + data.score + ':last').remove();
+            $('#gagnant-titre').append('<div id=' + data.score + '> Le gagnant est: <br />' + data.pseudo + ' avec <span style="color: #b30000;">' + data.score + '</span> points.</div>')
+            socket.emit('gagnant', {
+                score: data.score,
+                pseudo: data.pseudo
+            });
+        })
+
+        document.onkeydown = function(event) {
+            switch (event.keyCode) {
+                case 38:
+                    socket.emit('mouvement', {idTouche: 'haut',state: true});
+                    event.preventDefault();
+                    break;
+                case 40:
+                    socket.emit('mouvement', {idTouche: 'bas',state: true});
+                    event.preventDefault();
+                    break;
+                case 39:
+                    socket.emit('mouvement', {idTouche: 'droite',state: true});
+                    break;
+                case 37:
+                    socket.emit('mouvement', {idTouche: 'gauche',state: true});
+                    break;
+            };
+        };
+        document.onkeyup = function(event) {
+            switch (event.keyCode) {
+                case 38:
+                    socket.emit('mouvement', {idTouche: 'haut',state: false});
+                    break;
+                case 40:
+                    socket.emit('mouvement', {idTouche: 'bas',state: false});
+                    break;
+                case 39:
+                    socket.emit('mouvement', {idTouche: 'droite',state: false});
+                    break;
+                case 37:
+                    socket.emit('mouvement', {idTouche: 'gauche',state: false});
+                    break;
+            };
+        };
+
+        socket.on('deconnecte', function(deco) {
+            for (var i = 0; tableauConnexions[i]; i++) {
+                if (deco === tableauConnexions[i].id) {
+                    var suppr = document.getElementById(tableauConnexions[i].id);
+                    suppr.remove();
+                };
+            };
+        });
+    </script>
+</html>

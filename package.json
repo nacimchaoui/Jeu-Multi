@@ -1,0 +1,11 @@
+{
+  "author": "Nacim CHAOUI <nacim.chaoui@gmail.com>",
+  "name": "Jeu Multi",
+  "description": "Jeu multijoueur",
+  "version": "0.0.1",
+  "dependencies": {
+    "express": "~3.3.5",
+    "mongojs": "~2.4.0",
+    "socket.io": "~0.9.16"
+  }
+}
